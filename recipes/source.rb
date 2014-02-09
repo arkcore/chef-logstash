@@ -31,7 +31,7 @@ execute 'build-logstash' do
   )
   user 'root'
   # This variant is useful for troubleshooting stupid environment problems
-  command "make clean && make VERSION=#{logstash_version} --debug > /tmp/make.log 2>&1"
+  command "make clean && make VERSION=#{logstash_version} flatjar --debug > /tmp/make.log 2>&1"
   #command "make clean && make VERSION=#{logstash_version} flatjar"
   action :run
   creates "#{node['logstash']['basedir']}/source/build/logstash-#{logstash_version}-flatjar.jar"
