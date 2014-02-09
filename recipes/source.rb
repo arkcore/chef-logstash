@@ -29,7 +29,7 @@ execute 'build-logstash' do
   environment(
     :JAVA_HOME => node['logstash']['source']['java_home']
   )
-  user 'root'
+  user node['logstash']['user']
   # This variant is useful for troubleshooting stupid environment problems
   command "make clean && make VERSION=#{logstash_version} flatjar --debug > /tmp/make.log 2>&1"
   #command "make clean && make VERSION=#{logstash_version} flatjar"
