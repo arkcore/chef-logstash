@@ -1,4 +1,4 @@
-description "Logstash"
+description "Logstash server"
 author "Chef"
 
 start on (filesystem and net-device-up)
@@ -10,38 +10,39 @@ limit nofile 65550 65550
 
 chdir <%= node['logstash']['server']['home'] %>
 
-<% unless node['logstash']['server']['upstart_with_sudo'] -%>
 setuid <%= node['logstash']['user'] %>
-  <% unless node['logstash']['supervisor_gid'].to_s.empty? -%>
+<% unless node['logstash']['supervisor_gid'].to_s.empty? -%>
 setgid <%= node['logstash']['supervisor_gid'] %>
-  <% end -%>
 <% end -%>
 
+console log
 script
-  export LOGSTASH_HOME="<%= node['logstash']['server']['home'] %>"
-  export HOME=$LOGSTASH_HOME
-  export GC_OPTS="<%= node['logstash']['server']['gc_opts'] %>"
-  export JAVA_OPTS="-server -Xms<%= node['logstash']['server']['xms'] %> -Xmx<%= node['logstash']['server']['xmx'] %> -Djava.io.tmpdir=$LOGSTASH_HOME/tmp/ <%= node['logstash']['server']['java_opts'] %> <%= '-Djava.net.preferIPv4Stack=true' if node['logstash']['agent']['ipv4_only'] %>"
-  export LOGSTASH_OPTS="agent -f <%= node['logstash']['server']['config_dir'] %>"
-  <% if node['logstash']['server']['pluginpath'] -%>
-  export LOGSTASH_OPTS="$LOGSTASH_OPTS --pluginpath <%= node['logstash']['server']['pluginpath'] %>"
-  <% end -%>
-  <% if node['logstash']['server']['workers'] %>
-  export LOGSTASH_OPTS="$LOGSTASH_OPTS -w <%= node['logstash']['server']['workers'] %>"
-  <% end %>
-  <% if node['logstash']['server']['log_file'] -%>
-  export LOGSTASH_OPTS="$LOGSTASH_OPTS -l <%= node['logstash']['server']['log_file'] %>"
-  <% end -%>
-  <% if node['logstash']['server']['debug'] -%>
-  export LOGSTASH_OPTS="$LOGSTASH_OPTS -vv"
-  <% end -%>
-  export OPTS="$JAVA_OPTS $GC_OPTS -jar $LOGSTASH_HOME/lib/logstash.jar $LOGSTASH_OPTS"
+  # Defaults
+  PATH=/bin:/usr/bin
+  LS_HOME=/var/lib/logstash
+  LS_HEAP_SIZE="500m"
+  LS_JAVA_OPTS="-Djava.io.tmpdir=${LS_HOME}"
+  LS_LOG_FILE=/var/log/logstash/logstash.log
+  LS_USE_GC_LOGGING=""
+  LS_CONF_DIR=/etc/logstash/conf.d
+  LS_OPEN_FILES=16384
+  LS_NICE=19
+  LS_OPTS=""
 
-  <% if node['logstash']['server']['upstart_with_sudo'] -%>
-  exec sudo -u <%= node['logstash']['user'] %> /usr/bin/java $OPTS
-  <% else -%>
-  exec /usr/bin/java $OPTS
-  <% end -%>
+  # Override our defaults with user defaults:
+  [ -f /etc/default/logstash_<%= @type %> ] && . /etc/default/logstash
+
+  HOME="${HOME:-$LS_HOME}"
+  JAVA_OPTS="${LS_JAVA_OPTS}"
+  # Reset filehandle limit
+  ulimit -n ${LS_OPEN_FILES}
+  cd "${LS_HOME}"
+
+  # Export variables
+  export PATH HOME JAVA_OPTS LS_HEAP_SIZE LS_JAVA_OPTS LS_USE_GC_LOGGING
+  test -n "${JAVACMD}" && export JAVACMD
+
+  exec nice -n ${LS_NICE} ${HOME}/bin/logstash agent -f "${LS_CONF_DIR}" -l "${LS_LOG_FILE}" ${LS_OPTS}
 end script
 
-emits logstash-server-running
+emits logstash-<%= @type %>-running

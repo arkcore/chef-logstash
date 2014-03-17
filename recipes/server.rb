@@ -88,12 +88,6 @@ if node['logstash']['server']['install_method'] == 'jar'
   end
 else
   include_recipe 'logstash::source'
-
-  logstash_version = node['logstash']['source']['sha'] || "v#{node['logstash']['server']['version']}"
-  link "#{node['logstash']['server']['home']}/lib/logstash.jar" do
-    to "#{node['logstash']['basedir']}/source/build/logstash-#{logstash_version}-flatjar.jar"
-    notifies :restart, service_resource
-  end
 end
 
 directory "#{node['logstash']['server']['home']}/etc/conf.d" do
@@ -175,7 +169,14 @@ services.each do |type|
       if node['platform_version'] >= '12.04'
         template "/etc/init/logstash_#{type}.conf" do
           mode '0644'
+          variables :type => type
           source "logstash_#{type}.conf.erb"
+        end
+
+        template "/etc/default/logstash_#{type}" do
+            mode '0644'
+            variables :type => type
+            source "logstash.erb"
         end
 
         service "logstash_#{type}" do

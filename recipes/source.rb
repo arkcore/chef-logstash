@@ -31,9 +31,19 @@ execute 'build-logstash' do
   )
   user node['logstash']['user']
   # This variant is useful for troubleshooting stupid environment problems
-  command "make clean && make VERSION=#{logstash_version} flatjar --debug > /tmp/make.log 2>&1"
-  #command "make clean && make VERSION=#{logstash_version} flatjar"
+  command "make clean && make tarball --debug > /tmp/make.log 2>&1"
   action :run
-  creates "#{node['logstash']['basedir']}/source/build/logstash-#{logstash_version}-flatjar.jar"
-  not_if "test -f #{node['logstash']['basedir']}/source/build/logstash-#{logstash_version}-flatjar.jar"
+  creates "#{node['logstash']['basedir']}/source/build/logstash-#{logstash_version}.tar.gz"
+  not_if "test -f #{node['logstash']['basedir']}/source/build/logstash-#{logstash_version}.tar.gz"
+  notifies :run, 'execute[extract-logstash]', :immediately
 end
+
+execute 'extract-logstash' do
+  cwd "#{node['logstash']['basedir']}/source/build"
+  user node['logstash']['user']
+  command "rm -rf #{node['logstash']['server']['home']}/* && tar zxvf logstash-#{logstash_version}.tar.gz #{node['logstash']['server']['home']}"
+  action :none
+  notifies :restart, 'service[logstash_server]'
+end
+
+

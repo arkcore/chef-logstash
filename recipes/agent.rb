@@ -153,8 +153,16 @@ elsif node['logstash']['agent']['init_method'] == 'native'
       template '/etc/init/logstash_agent.conf' do
         mode '0644'
         source 'logstash_agent.conf.erb'
+        variables :type => "agent"
         notifies :restart, service_resource
       end
+
+      template "/etc/default/logstash_agent" do
+          mode '0644'
+          variables :type => type
+          source "logstash.erb"
+      end
+
 
       service 'logstash_agent' do
         provider Chef::Provider::Service::Upstart
