@@ -27,7 +27,7 @@ end
 execute 'build-logstash' do
   cwd "#{node['logstash']['basedir']}/source"
   environment(
-    :JAVA_HOME => node['logstash']['source']['java_home']
+    "JAVA_HOME" => node['logstash']['source']['java_home']
   )
   path ["/usr/local/rvm/gems/jruby-1.7.11/bin", "/usr/local/rvm/gems/jruby-1.7.11@global/bin",
   "/usr/local/rvm/rubies/jruby-1.7.11/bin","/usr/local/sbin","/usr/local/bin","/usr/sbin:/usr/bin",

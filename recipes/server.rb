@@ -169,13 +169,17 @@ services.each do |type|
       if node['platform_version'] >= '12.04'
         template "/etc/init/logstash_#{type}.conf" do
           mode '0644'
-          variables :type => type
+          variables(
+            :type => type
+          )
           source "logstash_#{type}.conf.erb"
         end
 
         template "/etc/default/logstash_#{type}" do
             mode '0644'
-            variables :type => type
+            variables(
+              :type => type
+            )
             source "logstash.erb"
         end
 
