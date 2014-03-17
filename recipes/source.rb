@@ -31,7 +31,7 @@ execute 'build-logstash' do
   )
   user node['logstash']['user']
   # This variant is useful for troubleshooting stupid environment problems
-  command "make clean && make tarball --debug"
+  command "make clean && make tarball; true"
   action :run
   creates "#{node['logstash']['basedir']}/source/build/logstash-#{logstash_version}.tar.gz"
   not_if "test -f #{node['logstash']['basedir']}/source/build/logstash-#{logstash_version}.tar.gz"
