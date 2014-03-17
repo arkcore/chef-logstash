@@ -44,7 +44,7 @@ end
 execute 'extract-logstash' do
   cwd "#{node['logstash']['basedir']}/source/build"
   user node['logstash']['user']
-  command "rm -rf #{node['logstash']['server']['home']}/* && tar zxvf logstash-#{logstash_version}.tar.gz #{node['logstash']['server']['home']}"
+  command "rm -rf #{node['logstash']['server']['home']}/* && tar zxvf logstash-#{logstash_version}.tar.gz -C #{node['logstash']['server']['home']}"
   action :nothing
   notifies :restart, 'service[logstash_server]'
 end
