@@ -162,7 +162,7 @@ elsif node['logstash']['agent']['init_method'] == 'native'
       template "/etc/default/logstash_agent" do
           mode '0644'
           variables(
-            :type => type
+            :type => "agent"
           )
           source "logstash.erb"
       end
