@@ -30,7 +30,7 @@ script
   LS_OPTS=""
 
   # Override our defaults with user defaults:
-  [ -f /etc/default/logstash_<%= @type %> ] && . /etc/default/logstash
+  [ -f /etc/default/logstash_<%= @type %> ] && . /etc/default/logstash_<%= @type %>
 
   HOME="${HOME:-$LS_HOME}"
   JAVA_OPTS="${LS_JAVA_OPTS}"
