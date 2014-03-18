@@ -41,12 +41,3 @@ execute 'build-logstash' do
   notifies :run, 'execute[extract-logstash]', :immediately
 end
 
-execute 'extract-logstash' do
-  cwd "#{node['logstash']['basedir']}/source/build"
-  user node['logstash']['user']
-  command "rm -rf #{node['logstash']['server']['home']}/* && tar zxvf logstash-#{logstash_version}.tar.gz --strip-components=1 -C #{node['logstash']['server']['home']}"
-  action :run
-  not_if "test -f #{node['logstash']['server']['home']}/bin/logstash"
-end
-
-

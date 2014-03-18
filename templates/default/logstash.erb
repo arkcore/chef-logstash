@@ -21,10 +21,10 @@ LS_OPTS="$LS_OPTS --pluginpath <%= node['logstash'][@type]['pluginpath'] %>"
 LS_OPTS="$LS_OPTS -w <%= node['logstash'][@type]['workers'] %>"
 <% end %>
 <% if node['logstash'][@type]['log_file'] -%>
-export LS_OPTS="$LS_OPTS -l $LS_LOG_FILE"
+LS_OPTS="$LS_OPTS -l $LS_LOG_FILE"
 <% end -%>
 <% if node['logstash'][@type]['debug'] -%>
-export LS_OPTS="$LS_OPTS -vv"
+LS_OPTS="$LS_OPTS -vv"
 <% end -%>
 
 # Arguments to pass to java
@@ -33,7 +33,7 @@ LS_JAVA_OPTS="-server -Xms<%= node['logstash'][@type]['xms'] %> -Xmx<%= node['lo
 LS_GC_OPTS="<%= node['logstash'][@type]['gc_opts'] %>"
 
 #Final java opts
-LS_JAVA_OPTS = "$LS_JAVA_OPTS $LS_GC_OPTS"
+LS_JAVA_OPTS="$LS_JAVA_OPTS $LS_GC_OPTS"
 
 # pidfiles aren't used for upstart; this is for sysv users.
 #LS_PIDFILE=/var/run/logstash.pid

@@ -183,6 +183,14 @@ services.each do |type|
             source "logstash.erb"
         end
 
+        execute 'extract-logstash' do
+          cwd "#{node['logstash']['basedir']}/source/build"
+          user node['logstash']['user']
+          command "rm -rf #{node['logstash']['server']['home']}/* && tar zxvf logstash-#{logstash_version}.tar.gz --strip-components=1 -C #{node['logstash'][type]['home']}"
+          action :run
+          not_if "test -f #{node['logstash']['server']['home']}/bin/logstash"
+        end
+
         service "logstash_#{type}" do
           provider Chef::Provider::Service::Upstart
           action [:enable, :start]
