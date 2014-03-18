@@ -88,6 +88,15 @@ if node['logstash']['server']['install_method'] == 'jar'
   end
 else
   include_recipe 'logstash::source'
+
+  execute 'extract-logstash' do
+    cwd "#{node['logstash']['basedir']}/source/build"
+    user node['logstash']['user']
+    command "rm -rf #{node['logstash']['server']['home']}/* && tar zxvf logstash-#{node['logstash']['server']['version']}.tar.gz --strip-components=1 -C #{node['logstash']['server']['home']}"
+    action :run
+    not_if "test -f #{node['logstash']['server']['home']}/bin/logstash"
+  end
+
 end
 
 directory "#{node['logstash']['server']['home']}/etc/conf.d" do
@@ -181,14 +190,6 @@ services.each do |type|
               :type => type
             )
             source "logstash.erb"
-        end
-
-        execute 'extract-logstash' do
-          cwd "#{node['logstash']['basedir']}/source/build"
-          user node['logstash']['user']
-          command "rm -rf #{node['logstash']['server']['home']}/* && tar zxvf logstash-#{logstash_version}.tar.gz --strip-components=1 -C #{node['logstash'][type]['home']}"
-          action :run
-          not_if "test -f #{node['logstash']['server']['home']}/bin/logstash"
         end
 
         service "logstash_#{type}" do

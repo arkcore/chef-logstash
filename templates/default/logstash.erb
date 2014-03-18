@@ -9,7 +9,7 @@
 LS_HOME="<%= node['logstash'][@type]['home'] %>"
 
 # logstash logging
-LS_LOG_FILE="<%= node['logstash'][@type]['log_file'] %>"
+LS_LOG_FILE=<%= node['logstash'][@type]['log_file'] %>
 #LS_USE_GC_LOGGING="true"
 
 # Arguments to pass to logstash agent
@@ -28,12 +28,14 @@ LS_OPTS="$LS_OPTS -vv"
 <% end -%>
 
 # Arguments to pass to java
-#LS_HEAP_SIZE="500m"
-LS_JAVA_OPTS="-server -Xms<%= node['logstash'][@type]['xms'] %> -Xmx<%= node['logstash'][@type]['xmx'] %> -Djava.io.tmpdir=$LS_HOME/tmp/ <%= node['logstash'][@type]['java_opts'] %> <%= '-Djava.net.preferIPv4Stack=true' if node['logstash']['agent']['ipv4_only'] %>"
-LS_GC_OPTS="<%= node['logstash'][@type]['gc_opts'] %>"
+LS_HEAP_SIZE="<%= node['logstash'][@type]['xmx'] %>"
+LS_JAVA_OPTS="-server -Xms<%= node['logstash'][@type]['xms'] %> -Djava.io.tmpdir=$LS_HOME/tmp/ <%= node['logstash'][@type]['java_opts'] %> <%= '-Djava.net.preferIPv4Stack=true' if node['logstash']['agent']['ipv4_only'] %>"
+
+# conflicts with logstash parallelnewgc
+#LS_GC_OPTS="<%= node['logstash'][@type]['gc_opts'] %>"
 
 #Final java opts
-LS_JAVA_OPTS="$LS_JAVA_OPTS $LS_GC_OPTS"
+#LS_JAVA_OPTS="$LS_JAVA_OPTS $LS_GC_OPTS"
 
 # pidfiles aren't used for upstart; this is for sysv users.
 #LS_PIDFILE=/var/run/logstash.pid

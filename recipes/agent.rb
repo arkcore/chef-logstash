@@ -101,11 +101,16 @@ if node['logstash']['agent']['install_method'] == 'jar'
 else
   include_recipe 'logstash::source'
 
-  logstash_version = node['logstash']['source']['sha'] || "v#{node['logstash']['server']['version']}"
-  link "#{node['logstash']['agent']['home']}/lib/logstash.jar" do
-    to "#{node['logstash']['basedir']}/source/build/logstash-#{logstash_version}-flatjar.jar"
-    notifies :restart, service_resource
+  logstash_version = node['logstash']['source']['sha'] || node['logstash']['server']['version']
+
+  execute 'extract-logstash' do
+    cwd "#{node['logstash']['basedir']}/source/build"
+    user node['logstash']['user']
+    command "rm -rf #{node['logstash']['agent']['home']}/* && tar zxvf logstash-#{logstash_version}.tar.gz --strip-components=1 -C #{node['logstash']['agent']['home']}"
+    action :run
+    not_if "test -f #{node['logstash']['agent']['home']}/bin/logstash"
   end
+
 end
 
 template "#{node['logstash']['agent']['home']}/#{node['logstash']['agent']['config_dir']}/#{node['logstash']['agent']['config_file']}" do
@@ -165,14 +170,6 @@ elsif node['logstash']['agent']['init_method'] == 'native'
             :type => "agent"
           )
           source "logstash.erb"
-      end
-
-      execute 'extract-logstash' do
-        cwd "#{node['logstash']['basedir']}/source/build"
-        user node['logstash']['user']
-        command "rm -rf #{node['logstash']['server']['home']}/* && tar zxvf logstash-#{logstash_version}.tar.gz --strip-components=1 -C #{node['logstash']['agent']['home']}"
-        action :run
-        not_if "test -f #{node['logstash']['server']['home']}/bin/logstash"
       end
 
       service 'logstash_agent' do
