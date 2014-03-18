@@ -47,7 +47,6 @@ execute 'extract-logstash' do
   command "rm -rf #{node['logstash']['server']['home']}/* && tar zxvf logstash-#{logstash_version}.tar.gz --strip-components=1 -C #{node['logstash']['server']['home']}"
   action :run
   not_if "test -f #{node['logstash']['server']['home']}/bin/logstash"
-  notifies :restart, 'service[logstash_server]'
 end
 
 

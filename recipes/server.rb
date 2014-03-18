@@ -186,6 +186,7 @@ services.each do |type|
         service "logstash_#{type}" do
           provider Chef::Provider::Service::Upstart
           action [:enable, :start]
+          subscribes :restart, 'execute[extract-logstash]'
         end
       else
         Chef::Log.fatal("Please set node['logstash']['server']['init_method'] to 'runit' for #{node['platform_version']}")

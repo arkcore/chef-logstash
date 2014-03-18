@@ -42,7 +42,7 @@ script
   export PATH HOME JAVA_OPTS LS_HEAP_SIZE LS_JAVA_OPTS LS_USE_GC_LOGGING
   test -n "${JAVACMD}" && export JAVACMD
 
-  exec nice -n ${LS_NICE} ${HOME}/bin/logstash agent -f "${LS_CONF_DIR}" -l "${LS_LOG_FILE}" ${LS_OPTS}
+  exec nice -n ${LS_NICE} ${HOME}/bin/logstash ${LS_OPTS}
 end script
 
 emits logstash-<%= @type %>-running

@@ -167,10 +167,10 @@ elsif node['logstash']['agent']['init_method'] == 'native'
           source "logstash.erb"
       end
 
-
       service 'logstash_agent' do
         provider Chef::Provider::Service::Upstart
         action [:enable, :start]
+        subscribes :restart, 'execute[extract-logstash]'
       end
     else
       Chef::Log.fatal("Please set node['logstash']['agent']['init_method'] to 'runit' for #{node['platform_version']}")
