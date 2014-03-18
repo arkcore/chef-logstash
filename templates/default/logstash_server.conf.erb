@@ -42,6 +42,9 @@ script
   export PATH HOME JAVA_OPTS LS_HEAP_SIZE LS_JAVA_OPTS LS_USE_GC_LOGGING
   test -n "${JAVACMD}" && export JAVACMD
 
+  echo "Logstash server upstart script running with env:"
+  env
+
   exec nice -n ${LS_NICE} ${HOME}/bin/logstash ${LS_OPTS}
 end script
 

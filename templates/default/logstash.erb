@@ -8,6 +8,10 @@
 # Set a home directory
 LS_HOME="<%= node['logstash'][@type]['home'] %>"
 
+# logstash logging
+LS_LOG_FILE="<%= node['logstash'][@type]['log_file'] %>"
+#LS_USE_GC_LOGGING="true"
+
 # Arguments to pass to logstash agent
 LS_OPTS="agent -f <%= node['logstash']['server']['config_dir'] %>"
 <% if node['logstash'][@type]['pluginpath'] -%>
@@ -17,7 +21,7 @@ LS_OPTS="$LS_OPTS --pluginpath <%= node['logstash'][@type]['pluginpath'] %>"
 LS_OPTS="$LS_OPTS -w <%= node['logstash'][@type]['workers'] %>"
 <% end %>
 <% if node['logstash'][@type]['log_file'] -%>
-export LS_OPTS="$LS_OPTS -l <%= node['logstash'][@type]['log_file'] %>"
+export LS_OPTS="$LS_OPTS -l $LS_LOG_FILE"
 <% end -%>
 <% if node['logstash'][@type]['debug'] -%>
 export LS_OPTS="$LS_OPTS -vv"
@@ -25,17 +29,17 @@ export LS_OPTS="$LS_OPTS -vv"
 
 # Arguments to pass to java
 #LS_HEAP_SIZE="500m"
-LS_JAVA_OPTS="<%= node['logstash'][@type]['gc_opts'] %> -server -Xms<%= node['logstash'][@type]['xms'] %> -Xmx<%= node['logstash'][@type]['xmx'] %> -Djava.io.tmpdir=$LS_HOME/tmp/ <%= node['logstash'][@type]['java_opts'] %> <%= '-Djava.net.preferIPv4Stack=true' if node['logstash']['agent']['ipv4_only'] %>"
+LS_JAVA_OPTS="-server -Xms<%= node['logstash'][@type]['xms'] %> -Xmx<%= node['logstash'][@type]['xmx'] %> -Djava.io.tmpdir=$LS_HOME/tmp/ <%= node['logstash'][@type]['java_opts'] %> <%= '-Djava.net.preferIPv4Stack=true' if node['logstash']['agent']['ipv4_only'] %>"
+LS_GC_OPTS="<%= node['logstash'][@type]['gc_opts'] %>"
+
+#Final java opts
+LS_JAVA_OPTS = "$LS_JAVA_OPTS $LS_GC_OPTS"
 
 # pidfiles aren't used for upstart; this is for sysv users.
 #LS_PIDFILE=/var/run/logstash.pid
 
 # user id to be invoked as; for upstart: edit /etc/init/logstash.conf
 LS_USER="<%= node['logstash']['user'] %>"
-
-# logstash logging
-LS_LOG_FILE="<%= node['logstash'][@type]['log_file'] %>"
-#LS_USE_GC_LOGGING="true"
 
 # logstash configuration directory
 LS_CONF_DIR="$LS_HOME/<%= node['logstash'][@type]['config_dir'] %>"
