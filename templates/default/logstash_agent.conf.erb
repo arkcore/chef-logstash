@@ -8,7 +8,7 @@ respawn
 respawn limit 5 30
 limit nofile 65550 65550
 
-chdir <%= node['logstash']['server']['home'] %>
+chdir <%= node['logstash'][@type]['home'] %>
 
 setuid <%= node['logstash']['user'] %>
 <% unless node['logstash']['supervisor_gid'].to_s.empty? -%>
@@ -39,8 +39,11 @@ script
   cd "${LS_HOME}"
 
   # Export variables
-  export PATH HOME JAVA_OPTS LS_HEAP_SIZE LS_JAVA_OPTS LS_USE_GC_LOGGING LS_OPTS
+  export PATH HOME JAVA_OPTS LS_HEAP_SIZE LS_JAVA_OPTS LS_USE_GC_LOGGING
   test -n "${JAVACMD}" && export JAVACMD
+
+  echo "Logstash agent upstart script running with env:"
+  env
 
   exec nice -n ${LS_NICE} ${HOME}/bin/logstash ${LS_OPTS}
 end script
