@@ -159,7 +159,7 @@ action :create do
       new_resource.updated_by_last_action(r.updated_by_last_action?)
     end
 
-    sd = directory "#{ls[:instance_dir]}/source" do
+    sd = directory "#{ls[:basedir]}/source" do
       action :create
       owner ls[:user]
       group ls[:group]
@@ -167,7 +167,7 @@ action :create do
     end
     new_resource.updated_by_last_action(sd.updated_by_last_action?)
 
-    gr = git "#{ls[:instance_dir]}/source" do
+    gr = git "#{ls[:basedir]}/source" do
       repository ls[:repo]
       revision ls[:sha]
       action :sync
@@ -178,18 +178,18 @@ action :create do
 
     source_version = "v#{@version}" || ls[:sha]
     er = execute 'build-logstash' do
-      cwd "#{ls[:instance_dir]}/source"
+      cwd "#{ls[:basedir]}/source"
       user ls[:user] # Changed from root cause building as root...WHA?
       command "make clean && make VERSION=#{source_version} tarball"
       action :run
-      creates "#{ls[:instance_dir]}/source/build/logstash-#{source_version}.tar.gz"
-      not_if "test -f #{ls[:instance_dir]}/source/build/logstash-#{source_version}.tar.gz"
+      creates "#{ls[:basedir]}/source/build/logstash-#{source_version}.tar.gz"
+      not_if "test -f #{ls[:basedir]}/source/build/logstash-#{source_version}.tar.gz"
     end
     new_resource.updated_by_last_action(er.updated_by_last_action?)
 
     il = execute "install-logstash" do
-      cwd "#{ls[:instance_dir]}"
-      command "rm -rf ./vendor && cp -r ./source/build/tarball/logstash-#{source_version}/* ./"
+      cwd "#{ls[:basedir]}"
+      command "rm -rf #{ls[:instance_dir]}/vendor && cp -r #{ls[:basedir]}/source/build/tarball/logstash-#{source_version}/* #{ls[:instance_dir]}/"
       user ls[:user]
       action :nothing
       subscribes :run, "execute[build-logstash]", :immediately
