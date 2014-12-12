@@ -98,11 +98,17 @@ action :enable do
   when 'native'
     native_init = ::Logstash.determine_native_init(node)
     args = default_args
+    
+    if svc[:install_type] === 'source'
+      source_name = 'tarball'
+    else
+      source_name = svc[:install_type]
+    end
 
     if native_init == 'upstart'
       tp = template "/etc/init/#{svc[:service_name]}.conf" do
         mode      '0644'
-        source    "init/upstart/#{svc[:name]}.erb"
+        source    "init/upstart/#{source_name}.erb"
         cookbook  svc[:templates_cookbook]
         variables(
                     user_supported: ::Logstash.upstart_supports_user?(node),
