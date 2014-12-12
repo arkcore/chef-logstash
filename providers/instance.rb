@@ -169,14 +169,14 @@ action :create do
 
     gr = git "#{ls[:instance_dir]}/source" do
       repository @repo
-      revision @sha
+      revision ls[:sha]
       action :sync
       user ls[:user]
       group ls[:group]
     end
     new_resource.updated_by_last_action(gr.updated_by_last_action?)
 
-    source_version = @sha || "v#{@version}"
+    source_version = ls[:sha] || "v#{@version}"
     er = execute 'build-logstash' do
       cwd "#{ls[:instance_dir]}/source"
       environment(JAVA_HOME: @java_home)
@@ -221,6 +221,7 @@ def ls_vars
     homedir: @useropts[:homedir],
     uid: @useropts[:uid],
     gid: @useropts[:gid],
+    sha: @sha,
     source_url: @source_url,
     version: @version,
     checksum: @checksum,
