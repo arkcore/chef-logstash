@@ -168,7 +168,7 @@ action :create do
     new_resource.updated_by_last_action(sd.updated_by_last_action?)
 
     gr = git "#{ls[:instance_dir]}/source" do
-      repository @repo
+      repository ls[:repo]
       revision ls[:sha]
       action :sync
       user ls[:user]
@@ -222,6 +222,7 @@ def ls_vars
     uid: @useropts[:uid],
     gid: @useropts[:gid],
     sha: @sha,
+    repo: @repo,
     source_url: @source_url,
     version: @version,
     checksum: @checksum,
