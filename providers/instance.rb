@@ -183,7 +183,7 @@ action :create do
       command "make clean && make VERSION=#{source_version} tarball"
       action :run
       creates "#{ls[:basedir]}/source/build/logstash-#{source_version}.tar.gz"
-      not_if { File.exist?("#{ls[:basedir]}/source/build/logstash-#{source_version}.tar.gz") }
+      not_if { ::File.exists?("#{ls[:basedir]}/source/build/logstash-#{source_version}.tar.gz") }
     end
     new_resource.updated_by_last_action(er.updated_by_last_action?)
 
