@@ -189,7 +189,7 @@ action :create do
 
     il = execute "install-logstash" do
       cwd "#{ls[:instance_dir]}"
-      command "cp -r ./source/build/tarball/logstash-#{source_version}/* ./"
+      command "rm -rf ./vendor && cp -r ./source/build/tarball/logstash-#{source_version}/* ./"
       user ls[:user]
       action :nothing
       subscribes :run, "execute[build-logstash]", :immediately
