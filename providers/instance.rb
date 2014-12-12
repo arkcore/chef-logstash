@@ -17,8 +17,8 @@ def load_current_resource
   @version = new_resource.version || Logstash.get_attribute_or_default(node, @name, 'version')
   @checksum = new_resource.checksum || Logstash.get_attribute_or_default(node, @name, 'checksum')
   @source_url = new_resource.source_url || Logstash.get_attribute_or_default(node, @name, 'source_url')
-  @repo = new_resource.repo
-  @sha = new_resource.sha
+  @repo = new_resource.repo || Logstash.get_attribute_or_default(node, @name, 'repo')
+  @sha = new_resource.sha || Logstash.get_attribute_or_default(node, @name, 'sha')
   @java_home = new_resource.java_home || Logstash.get_attribute_or_default(node, @name, 'java_home')
   @create_account = new_resource.create_account || Logstash.get_attribute_or_default(node, @name, 'create_account')
   @user = new_resource.user || Logstash.get_attribute_or_default(node, @name, 'user')
