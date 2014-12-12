@@ -176,22 +176,27 @@ action :create do
     end
     new_resource.updated_by_last_action(gr.updated_by_last_action?)
 
-    source_version = ls[:sha] || "v#{@version}"
+    source_version = "v#{@version}" || ls[:sha]
     er = execute 'build-logstash' do
       cwd "#{ls[:instance_dir]}/source"
       environment(JAVA_HOME: @java_home)
       user ls[:user] # Changed from root cause building as root...WHA?
-      command "make clean && make VERSION=#{source_version} jar"
+      command "make clean && make VERSION=#{source_version} tarball"
       action :run
-      creates "#{ls[:instance_dir]}/source/build/logstash-#{source_version}--monolithic.jar"
-      not_if "test -f #{ls[:instance_dir]}/source/build/logstash-#{source_version}--monolithic.jar"
+      creates "#{ls[:instance_dir]}/source/build/logstash-#{source_version}.tar.gz"
+      not_if "test -f #{ls[:instance_dir]}/source/build/logstash-#{source_version}.tar.gz"
     end
     new_resource.updated_by_last_action(er.updated_by_last_action?)
-    lr = link "#{ls[:instance_dir]}/lib/logstash.jar" do
-      to "#{ls[:instance_dir]}/source/build/logstash-#{source_version}--monolithic.jar"
-      only_if { new_resource.auto_symlink }
+
+    il = execute "install-logstash" do
+      cwd "#{ls[:instance_dir]}"
+      code "cp -r ./source/build/tarball/logstash-#{source_version}/* ./"
+      user ls[:user]
+      action :nothing
+      subscribes :run, "execute[build-logstash]", :immediately
     end
-    new_resource.updated_by_last_action(lr.updated_by_last_action?)
+    new_resource.updated_by_last_action(il.updated_by_last_action?)
+
   else
     Chef::Application.fatal!("Unknown install type: #{@install_type}")
   end
