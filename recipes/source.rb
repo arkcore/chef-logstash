@@ -1,6 +1,5 @@
 # Encoding: utf-8
 include_recipe 'build-essential'
-include_recipe 'java'
 include_recipe 'ant'
 include_recipe 'git'
 include_recipe 'logstash::default'
@@ -27,7 +26,7 @@ end
 execute 'build-logstash' do
   cwd "#{node['logstash']['basedir']}/source"
   environment(
-    :JAVA_HOME => node['logstash']['source']['java_home']
+    JAVA_HOME: node['logstash']['source']['java_home']
   )
   user 'root'
   # This variant is useful for troubleshooting stupid environment problems
