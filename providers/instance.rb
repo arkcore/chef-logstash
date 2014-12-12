@@ -179,7 +179,6 @@ action :create do
     source_version = "v#{@version}" || ls[:sha]
     er = execute 'build-logstash' do
       cwd "#{ls[:instance_dir]}/source"
-      environment(JAVA_HOME: @java_home)
       user ls[:user] # Changed from root cause building as root...WHA?
       command "make clean && make VERSION=#{source_version} tarball"
       action :run
