@@ -169,7 +169,7 @@ action :create do
 
     gr = git "#{ls[:instance_dir]}/source" do
       repository @repo
-      reference @sha
+      revision @sha
       action :sync
       user ls[:user]
       group ls[:group]
