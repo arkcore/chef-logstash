@@ -18,8 +18,8 @@ attribute :version, kind_of: String
 attribute :checksum, kind_of: String
 attribute :source_url, kind_of: String
 # sha/repo/java_home used by `source` install_type
-attribute :sha, kind_of: String, default: 'HEAD'
-attribute :repo, kind_of: String, default: 'git://github.com/logstash/logstash.git'
+attribute :sha, kind_of: String
+attribute :repo, kind_of: String
 attribute :java_home, kind_of: String
 attribute :user, kind_of: String
 attribute :group, kind_of: String
