@@ -102,7 +102,7 @@ action :enable do
     if native_init == 'upstart'
       tp = template "/etc/init/#{svc[:service_name]}.conf" do
         mode      '0644'
-        source    "init/upstart/#{svc[:install_type]}.erb"
+        source    "init/upstart/#{svc[:instance]}.erb"
         cookbook  svc[:templates_cookbook]
         variables(
                     user_supported: ::Logstash.upstart_supports_user?(node),
